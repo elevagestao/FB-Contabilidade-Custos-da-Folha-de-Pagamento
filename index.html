@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="Augusto Almeida" />
+    <title>Folha de Pagamento</title>
+    <!-- Fonte Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" type="image/x-icon" href="favicon-augustoalmeida.PNG" />
+  </head>
+
+  <body>
+    <main class="page">
+      <form
+        class="card"
+        action="https://elevagestaofinanceira.app.n8n.cloud/webhook-test/folhapagamento"
+        method="post"
+        enctype="multipart/form-data"
+        id="uploadForm"
+        novalidate
+      >
+        <h1>FOLHA DE PAGAMENTO</h1>
+
+        <p class="lead">
+          Faça upload do seu arquivo .XLSX e PDF com os dados para processamento.
+        </p>
+
+        <label class="dropzone" for="file" aria-describedby="dz-hint">
+  <input
+    id="file"
+    name="file"
+    type="file"
+    accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.pdf,application/pdf"
+    multiple
+    required
+  />
+  <div class="file-row" id="dz-hint">
+    Clique para selecionar os arquivos ou arraste aqui
+  </div>
+
+  <!-- Novo: lista de arquivos -->
+  <ul id="fileList" class="file-list" aria-live="polite" aria-relevant="additions removals">
+    <!-- Itens gerados via JS -->
+  </ul>
+</label>
+
+        <p style="font-size: 1rem; color: #555; margin-top: 12px">
+          ⚠️ Apenas arquivos <strong>.XLSX</strong> e <strong>PDF</strong></strong>.
+        </p>
+
+        <div class="actions">
+          <button class="btn btn-primary" type="submit" id="btnSubmit">
+            Enviar
+          </button>
+          <button class="btn btn-outline" type="reset">Limpar seleção</button>
+        </div>
+
+        <div class="foot">.xlsx | pdf · Máx. 50&nbsp;MB</div>
+      </form>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,565 @@
+/* ---------- Reset ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---------- Tokens ---------- */
+:root {
+  /* Base clara */
+  --bg-top: #f7fbff;
+  --bg-mid: #ffffff;
+  --bg-bot: #f5fbff;
+
+  --ink: #0e1320; /* texto principal */
+  --muted: #667085; /* texto secundário */
+
+  /* Acentos frios (aurora) */
+  --a1: #6d4eff; /* violeta/índigo */
+  --a2: #00c2ff; /* ciano */
+  --a3: #a0f0ff; /* aqua suave */
+
+  /* Efeitos vidro */
+  --glass-blur: 28px; /* MUITO blur */
+  --glass-sat: 180%;
+  --glass-alpha: 0.42; /* cartão translúcido */
+  --glass-alpha-weak: 0.32;
+  --stroke-rgb: 255 255 255;
+
+  --shadow-lg: 0 30px 80px rgba(13, 38, 76, 0.3),
+    0 16px 30px rgba(37, 99, 235, 0.3);
+  --shadow-sm: 0 10px 30px rgba(13, 38, 76, 0.17),
+    0 6px 16px rgba(37, 99, 235, 0.15);
+
+  --ring: #53d1ff;
+}
+
+/* ===========================================================
+   CENÁRIO — Fundo líquido com aurora e BOLHAS animadas
+   - Blobs gigantes (pseudo-elements)
+   - Camada de “aurora ribbons” (multi-gradients com parallax)
+   - Camada de bolhas (sprites via radial-gradient + bg-position)
+   =========================================================== */
+.page {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+
+  /* céu leitoso */
+  background: linear-gradient(
+    180deg,
+    var(--bg-top),
+    var(--bg-mid) 40%,
+    var(--bg-bot)
+  );
+}
+
+/* BLOBS volumétricos (duas massas grandes) */
+.page::before,
+.page::after {
+  content: "";
+  position: absolute;
+  inset: auto;
+  width: 70vmax;
+  height: 70vmax;
+  border-radius: 999px;
+  filter: blur(70px);
+  opacity: 0.26;
+  pointer-events: none;
+  z-index: 0;
+  animation: blobFloat 20s ease-in-out infinite alternate;
+}
+.page::before {
+  left: -20vmax;
+  top: -24vmax;
+  background: radial-gradient(
+      closest-side at 40% 40%,
+      rgba(109, 78, 255, 0.85),
+      transparent 60%
+    ),
+    radial-gradient(
+      closest-side at 70% 60%,
+      rgba(160, 240, 255, 0.95),
+      transparent 65%
+    );
+}
+.page::after {
+  right: -22vmax;
+  bottom: -30vmax;
+  background: radial-gradient(
+      closest-side at 50% 50%,
+      rgba(0, 194, 255, 0.85),
+      transparent 60%
+    ),
+    radial-gradient(
+      closest-side at 65% 40%,
+      rgba(173, 216, 255, 0.9),
+      transparent 65%
+    );
+  animation-duration: 24s;
+}
+@keyframes blobFloat {
+  to {
+    transform: translate(8%, 6%) scale(1.06);
+  }
+}
+
+/* AURORA “ribbons” com leve parallax (camada fixa) */
+.page {
+  --r1: radial-gradient(
+    900px 600px at 12% -10%,
+    rgba(109, 78, 255, 0.18),
+    transparent 60%
+  );
+  --r2: radial-gradient(
+    900px 600px at 110% 0%,
+    rgba(0, 194, 255, 0.18),
+    transparent 60%
+  );
+  --r3: radial-gradient(
+    1000px 700px at 50% 110%,
+    rgba(160, 240, 255, 0.16),
+    transparent 60%
+  );
+  background-image: var(--r1), var(--r2), var(--r3),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 40%, var(--bg-bot));
+  background-repeat: no-repeat;
+  background-position: 0 0, 100% 0, 50% 100%, 0 0;
+  animation: auroraParallax 16s linear infinite;
+}
+@keyframes auroraParallax {
+  0% {
+    background-position: 0 0, 100% 0, 50% 100%, 0 0;
+  }
+  50% {
+    background-position: 10% -2%, 90% 2%, 48% 98%, 0 0;
+  }
+  100% {
+    background-position: 0 0, 100% 0, 50% 100%, 0 0;
+  }
+}
+
+/* BOLHAS: camada animada via múltiplos radial-gradients */
+.page::marker {
+  content: "";
+} /* noop para evitar warnings em alguns bundlers */
+
+/* “spray” de bolhas usando background em um pseudo-container invisível */
+.page > .__bubble_layer__ {
+  display: none;
+} /* reserva de seletor */
+
+@keyframes bubbleRise {
+  0% {
+    background-position: 10% 110%, 25% 120%, 40% 115%, 55% 118%, 70% 112%,
+      85% 117%;
+    opacity: 0.2;
+  }
+  50% {
+    background-position: 12% 50%, 28% 40%, 42% 55%, 57% 45%, 72% 52%, 87% 48%;
+    opacity: 0.28;
+  }
+  100% {
+    background-position: 14% -10%, 31% -20%, 44% -15%, 60% -18%, 74% -12%,
+      90% -17%;
+    opacity: 0.2;
+  }
+}
+
+/* cria a camada de bolhas numa pseudo-camada da .page (usando :before extra) */
+.page::after,
+.page::before {
+  mix-blend-mode: normal;
+}
+
+/* bolhas extras usando a própria .page (camada de fundo) */
+.page {
+  --bubbles: radial-gradient(
+        18px 18px at center,
+        rgba(255, 255, 255, 0.85),
+        rgba(255, 255, 255, 0) 60%
+      )
+      10% 110%/18px 18px no-repeat,
+    radial-gradient(
+        26px 26px at center,
+        rgba(255, 255, 255, 0.8),
+        rgba(255, 255, 255, 0) 60%
+      )
+      25% 120%/26px 26px no-repeat,
+    radial-gradient(
+        14px 14px at center,
+        rgba(255, 255, 255, 0.9),
+        rgba(255, 255, 255, 0) 60%
+      )
+      40% 115%/14px 14px no-repeat,
+    radial-gradient(
+        22px 22px at center,
+        rgba(255, 255, 255, 0.86),
+        rgba(255, 255, 255, 0) 60%
+      )
+      55% 118%/22px 22px no-repeat,
+    radial-gradient(
+        16px 16px at center,
+        rgba(255, 255, 255, 0.88),
+        rgba(255, 255, 255, 0) 60%
+      )
+      70% 112%/16px 16px no-repeat,
+    radial-gradient(
+        20px 20px at center,
+        rgba(255, 255, 255, 0.86),
+        rgba(255, 255, 255, 0) 60%
+      )
+      85% 117%/20px 20px no-repeat;
+  background-image: var(--r1), var(--r2), var(--r3),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 40%, var(--bg-bot)),
+    /* layer de bolhas no fim para animar isolada via bg-position */
+      radial-gradient(18px 18px, transparent, transparent); /* placeholder */
+}
+.page {
+  animation: auroraParallax 16s linear infinite,
+    bubbles 14s ease-in-out infinite;
+}
+@keyframes bubbles {
+  0% {
+    box-shadow: none;
+  }
+  25% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+  } /* noop */
+  50% {
+    box-shadow: none;
+  } /* noop */
+  100% {
+    box-shadow: none;
+  } /* noop */
+}
+/* truque: camada de bolhas separada via ::after-overlay */
+.page::selection {
+  background: rgba(0, 0, 0, 0.08);
+} /* sem efeito visual */
+
+/* ===========================================================
+   CARD — vidro de alto brilho
+   =========================================================== */
+.card {
+  position: relative;
+  z-index: 1;
+  width: min(880px, 92vw);
+  padding: 36px 32px;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, var(--glass-alpha));
+  color: var(--ink);
+  border: 1px solid rgba(2, 6, 23, 0.06);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: saturate(var(--glass-sat)) blur(var(--glass-blur));
+  -webkit-backdrop-filter: saturate(var(--glass-sat)) blur(var(--glass-blur));
+  overflow: clip;
+}
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.65),
+      transparent 50%
+    ),
+    radial-gradient(
+      1200px 400px at 50% -10%,
+      rgba(255, 255, 255, 0.65),
+      transparent 60%
+    );
+  mix-blend-mode: soft-light;
+}
+.card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(var(--stroke-rgb), 0.38);
+  pointer-events: none;
+}
+
+/* Título */
+.card > h1 {
+  margin: 2px 0 10px;
+  font-size: clamp(22px, 3vw, 36px);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+  text-transform: uppercase;
+  background: linear-gradient(90deg, #6a3ec4, #2d65ef 60%, #a0f0ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.lead {
+  margin: 0 0 22px;
+  color: var(--muted);
+  font-size: clamp(14px, 2.2vw, 16px);
+}
+
+/* ===========================================================
+   DROPZONE — “prato” de vidro com estados ricos
+   =========================================================== */
+.dropzone {
+  position: relative;
+  display: block;
+  cursor: pointer;
+  text-align: center;
+  padding: 28px 22px;
+  border-radius: 22px;
+  border: 1.5px dashed rgba(99, 102, 241, 0.35);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.68),
+    rgba(255, 255, 255, 0.42)
+  );
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(calc(var(--glass-blur) * 0.75)) saturate(170%);
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 0.75)) saturate(170%);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease,
+    background-color 0.2s ease;
+}
+.dropzone::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.6),
+    rgba(255, 255, 255, 0.12)
+  );
+  filter: blur(8px);
+  opacity: 0.55;
+}
+.dropzone:hover {
+  transform: translateY(-2px);
+  border-color: #00c2ff;
+}
+.dropzone:focus-within {
+  outline: 2px solid transparent;
+  border-color: var(--ring);
+  box-shadow: 0 0 0 10px rgba(83, 209, 255, 0.2), var(--shadow-sm);
+}
+.dropzone.is-dragover {
+  border-color: #6d4eff;
+  box-shadow: 0 0 0 12px rgba(109, 78, 255, 0.14),
+    0 12px 28px rgba(13, 38, 76, 0.18);
+  transform: translateY(-3px);
+}
+.dropzone.is-invalid {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 10px rgba(239, 68, 68, 0.14),
+    0 12px 28px rgba(13, 38, 76, 0.18);
+}
+
+/* input invisível porém clicável */
+.dropzone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.001;
+  cursor: pointer;
+  z-index: 2;
+}
+
+/* legenda dentro da dropzone */
+.file-row {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* ===========================================================
+   LISTA DE ARQUIVOS
+   =========================================================== */
+.file-list {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  margin-top: 8px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.58);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  box-shadow: 0 6px 16px rgba(13, 38, 76, 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.file-item.bad {
+  border-color: #ef4444;
+  background: rgba(255, 241, 242, 0.75);
+}
+.file-name {
+  font-weight: 700;
+  color: var(--ink);
+  word-break: break-all;
+}
+.file-meta {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+.file-err {
+  margin-left: auto;
+  font-weight: 700;
+  color: #b91c1c;
+  font-size: 0.9rem;
+}
+.btn-x {
+  margin-left: 4px;
+  border: 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 2px 8px rgba(13, 38, 76, 0.16);
+}
+.btn-x:hover {
+  background: #fff;
+}
+
+/* ===========================================================
+   AÇÕES / BOTÕES
+   =========================================================== */
+.actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.btn {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  border-radius: 14px;
+  padding: 14px 18px;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.08s ease, filter 0.2s ease, box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+/* primário translúcido “sweep” */
+.btn-primary {
+  color: #0b1220;
+  background: linear-gradient(
+    355deg,
+    rgb(240 173 255 / 88%),
+    rgb(41 88 233 / 50%) 60%,
+    rgb(77 142 204 / 20%)
+  );
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.65),
+    0 12px 28px rgba(13, 38, 76, 0.18);
+  backdrop-filter: blur(10px) saturate(160%);
+}
+.btn-primary:hover {
+  filter: brightness(1.05);
+}
+.btn-primary:active {
+  transform: translateY(1px);
+  filter: brightness(0.97);
+}
+
+/* outline de vidro */
+.btn-outline {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.58);
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    0 10px 24px rgba(13, 38, 76, 0.14);
+  backdrop-filter: blur(10px) saturate(160%);
+}
+.btn-outline:hover {
+  border-color: #00c2ff;
+}
+
+/* ===========================================================
+   RODAPÉ / texto secundário
+   =========================================================== */
+.foot {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ===========================================================
+   ACESSIBILIDADE / PREFERÊNCIAS
+   =========================================================== */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 1px, 1px);
+  white-space: nowrap;
+  border: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ===========================================================
+   FALLBACK (quando não há suporte a backdrop-filter)
+   =========================================================== */
+@supports not (
+  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+) {
+  .card {
+    background: #ffffffef;
+  }
+  .dropzone {
+    background: #ffffffdd;
+  }
+  .file-item {
+    background: #ffffffe6;
+  }
+  .btn-outline {
+    background: #ffffffee;
+  }
+}
+
+/* ===========================================================
+   PEQUENOS AJUSTES RESPONSIVOS
+   =========================================================== */
+@media (max-width: 520px) {
+  .card {
+    padding: 28px 20px;
+  }
+  .dropzone {
+    padding: 22px 16px;
+  }
+}
