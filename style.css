@@ -303,15 +303,10 @@ body {
   letter-spacing: 0.02em;
   line-height: 1.1;
   text-transform: uppercase;
-  background: linear-gradient(90deg, #6a3ec4, #2d65ef 60%, #a0f0ff 100%);
+  background: linear-gradient(90deg, #6a3ec4, #2d65ef 60%, #14262a 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-}
-.lead {
-  margin: 0 0 22px;
-  color: var(--muted);
-  font-size: clamp(14px, 2.2vw, 16px);
 }
 
 /* ===========================================================
